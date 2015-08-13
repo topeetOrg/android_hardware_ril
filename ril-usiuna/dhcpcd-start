@@ -1,0 +1,25 @@
+#!/system/bin/sh
+
+DHCPCD_PID=""
+DHCPCD_EXIT=""
+
+/system/bin/log -t dhcpcd "Starting dhcpcd"
+
+ECM_INTERFACE=`/system/bin/getprop "ril.ecm.interface"`
+
+/system/bin/log -t dhcpcd "ECM Network Interface is: $ECM_INTERFACE"
+
+/system/bin/netcfg $ECM_INTERFACE up
+
+/system/bin/dhcpcd $ECM_INTERFACE
+
+DHCPCD_EXIT=$?
+
+DHCPCD_PID=`/system/bin/cat "/data/misc/dhcp/dhcpcd-$ECM_INTERFACE.pid"`
+
+/system/bin/log -t dhcpcd "dhcpcd forked pid is $DHCPCD_PID"
+/system/bin/setprop "net.gprs.dhcp-pid" "$DHCPCD_PID"
+
+/system/bin/log -t dhcpcd "dhcpcd exited with $DHCPCD_EXIT"
+/system/bin/setprop "net.gprs.dhcp-exit" "$DHCPCD_EXIT"
+

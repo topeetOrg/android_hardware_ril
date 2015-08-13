@@ -1,0 +1,21 @@
+#!/system/bin/sh
+
+DHCPCD_PID=""
+DHCPCD_EXIT=""
+
+/system/bin/log -t dhcpcd "Stopping dhcpcd"
+
+ECM_INTERFACE=`/system/bin/getprop "ril.ecm.interface"`
+
+/system/bin/log -t dhcpcd "ECM Network Interface is: $ECM_INTERFACE"
+
+DHCPCD_PID=`/system/bin/cat "/data/misc/dhcp/dhcpcd-$ECM_INTERFACE.pid"`
+
+/system/bin/kill $DHCPCD_PID
+
+DHCPCD_EXIT=$?
+
+/system/bin/log -t dhcpcd "dhcpcd terminated with pid $DHCPCD_PID"
+/system/bin/log -t dhcpcd "dhcpcd exited with $DHCPCD_EXIT"
+/system/bin/setprop "net.gprs.dhcp-exit" "$DHCPCD_EXIT"
+
